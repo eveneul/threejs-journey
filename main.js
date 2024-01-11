@@ -31,14 +31,25 @@ const renderer = new THREE.WebGLRenderer({ canvas });
 renderer.setSize(window.innerWidth, window.innerHeight);
 
 // animation
+
+let now, delta;
+let then = Date.now();
+const interval = 1000 / 60
+
+
 const tick = () => {
   requestAnimationFrame(tick)
+  now = Date.now();
+  delta = now - then;
+  if (delta < interval) return;
   // 모델링의 애니메이션을 먼저 설정해 주고
-  box.rotation.x -= 0.01
+  box.rotation.x *= 0.01
   box.rotation.y += 0.01
 
   // renderer.render()로 다시 랜더링 시켜 주기
   renderer.render(scene, camera)
+
+  then = now - (delta % interval);
 
 }
 
