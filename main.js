@@ -14,7 +14,6 @@ const box = new THREE.Mesh(geometry, material);
 
 scene.add(box);
 
-console.log(box.position.length())
 
 // camera 
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -30,4 +29,17 @@ scene.add(axesHelper)
 
 const renderer = new THREE.WebGLRenderer({ canvas });
 renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.render(scene, camera)
+
+// animation
+const tick = () => {
+  requestAnimationFrame(tick)
+  // 모델링의 애니메이션을 먼저 설정해 주고
+  box.rotation.x -= 0.01
+  box.rotation.y += 0.01
+
+  // renderer.render()로 다시 랜더링 시켜 주기
+  renderer.render(scene, camera)
+
+}
+
+tick();
