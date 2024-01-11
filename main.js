@@ -1,7 +1,10 @@
 import * as THREE from 'three';
+import gsap from 'gsap'
 
 const canvas = document.querySelector("canvas")
 const scene = new THREE.Scene();
+
+console.log(gsap)
 
 
 
@@ -36,15 +39,25 @@ let now, delta;
 let then = Date.now();
 const interval = 1000 / 60
 
+const clock = new THREE.Clock();
+
+
+gsap.to(box.position, { x: 2, duration: 1, delay: 1 })
 
 const tick = () => {
+
+  //elapsed time: 경과시간
+  const elapsedTime = clock.getElapsedTime();
+
+
   requestAnimationFrame(tick)
   now = Date.now();
   delta = now - then;
   if (delta < interval) return;
   // 모델링의 애니메이션을 먼저 설정해 주고
-  box.rotation.x *= 0.01
-  box.rotation.y += 0.01
+
+  // box.position.y = Math.sin(elapsedTime)
+  // box.position.x = Math.cos(elapsedTime)
 
   // renderer.render()로 다시 랜더링 시켜 주기
   renderer.render(scene, camera)
