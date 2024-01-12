@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import gsap from 'gsap'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import GUI from 'lil-gui';
+import {RGBELoader} from "three/examples/jsm/loaders/RGBELoader" // 배경 추가
 
 
 
@@ -75,7 +76,7 @@ matcapTexture.colorSpace = THREE.SRGBColorSpace
 
 // MeshStandardMaterial: 옵션이 많아서 자주 쓰임
 const material = new THREE.MeshStandardMaterial({
-  metalness: 0.45, roughness: 0.45
+  metalness: 0.7, roughness: 0.2
 });
 
 gui.add(material, "metalness").min(0).max(1).step(0.0001);
@@ -95,6 +96,17 @@ pointLight.position.z = 4;
 
 scene.add(ambientLight)
 scene.add(pointLight)
+
+/* background map loader */
+const rgbeLoader = new RGBELoader();
+rgbeLoader.load("/textures/environmentMap/2k.hdr", (map) => {
+  map.mapping = THREE.EquirectangularReflectionMapping;
+  scene.background = map;
+  scene.environment = map
+})
+
+
+/* Object */
 
 const sphere = new THREE.Mesh(
   new THREE.SphereGeometry(0.5, 16, 16),
