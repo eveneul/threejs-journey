@@ -25,11 +25,11 @@ matcapTexture.colorSpace = THREE.SRGBColorSpace
 /* Object */
 
 // MeshBasicMaterial
-const material = new THREE.MeshBasicMaterial({
-  // map: doorColorTexture,
-  // color: "green"
+// const material = new THREE.MeshBasicMaterial({
+//   // map: doorColorTexture,
+//   // color: "green"
   
-})
+// })
 
 // material.color = "green" <= 작동하지 않음
 // material.color = new THREE.Color("green") <= 클래스로 보내 줘야 함
@@ -42,6 +42,10 @@ const material = new THREE.MeshBasicMaterial({
 
 // material.side = THREE.DoubleSide // 오브젝트 앞뒷면 둘다 보이게
 
+// MeshNormalMaterial
+const material = new THREE.MeshNormalMaterial()
+material.side = THREE.DoubleSide // 오브젝트 앞뒷면 둘다 보이게
+// material.flatShading = true // 둥근 부분을 평평하게 (각지게)
 
 const sphere = new THREE.Mesh(
   new THREE.SphereGeometry(0.5, 16, 16),
