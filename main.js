@@ -23,6 +23,7 @@ const doorAmbientOcclusionTexture = textureLoader.load("/textures/door/ambientOc
 const doorHeightTexture = textureLoader.load("/textures/door/height.jpg")
 const doorMetalnessTexture = textureLoader.load("/textures/door/metalness.jpg")
 const doorRoughnessTexture = textureLoader.load("/textures/door/roughness.jpg")
+const doorNormalTexture = textureLoader.load("/textures/door/normal.jpg")
 const matcapTexture = textureLoader.load("/textures/matcaps/1.png")
 const gradientTexture = textureLoader.load("/textures/gradients/3.jpg")
 
@@ -75,27 +76,61 @@ matcapTexture.colorSpace = THREE.SRGBColorSpace
 // const material = new THREE.MeshToonMaterial();
 
 // MeshStandardMaterial: 옵션이 많아서 자주 쓰임
-const material = new THREE.MeshStandardMaterial({
-  metalness: 0.7, roughness: 0.2
-});
+// const material = new THREE.MeshStandardMaterial({
+//   metalness: 0.7,
+//   roughness: 0.2,
+//   map: doorColorTexture,
+//   aoMap: doorAmbientOcclusionTexture,
+//   aoMapIntensity: 1,
+//   displacementMap: doorHeightTexture,
+//   wireframe: false,
+//   displacementScale: 0.1
+  
+// });
+
+// material.metalnessMap = doorMetalnessTexture;
+// material.roughnessMap = doorRoughnessTexture;
+// material.normalMap = doorNormalTexture // 빛에 반응
+
+const material = new THREE.MeshPhysicalMaterial();
+  material.metalness =  0;
+  material.roughness =  0;
+//   material.map =  doorColorTexture;
+//   material.aoMap =  doorAmbientOcclusionTexture;
+//   material.aoMapIntensity =  1;
+//   material.displacementMap =  doorHeightTexture;
+//   material.wireframe =  false;
+//   material.displacementScale = 0.1
+// // material.alphaMap = doorAlphaColorTexture;
+//   material.transparent = true
+
+
+//   // Clearcoat 
+// material.clearcoat = 1;
+// material.clearcoatRoughness = 0
+material.ior = 1.5
+material.thickness = 0.5
+material.transmission = 1
+
+
 
 gui.add(material, "metalness").min(0).max(1).step(0.0001);
 gui.add(material, "roughness").min(0).max(1).step(0.0001);
-
-
+gui.add(material, "clearcoat").min(0).max(1).step(0.0001);
+gui.add(material, "clearcoatRoughness").min(0).max(1).step(0.0001);
 
 
 material.side = THREE.DoubleSide;
 
 /* Light */
-const ambientLight = new THREE.AmbientLight(0xffffff, 1)
-const pointLight = new THREE.PointLight(0xffffff, 30)
-pointLight.position.x = 2;
-pointLight.position.y = 3;
-pointLight.position.z = 4;
+// const ambientLight = new THREE.AmbientLight(0xffffff, 1)
+// const pointLight = new THREE.PointLight(0xffffff, 30)
+// pointLight.position.x = 2;
+// pointLight.position.y = 3;
+// pointLight.position.z = 4;
 
-scene.add(ambientLight)
-scene.add(pointLight)
+// scene.add(ambientLight)
+// scene.add(pointLight)
 
 /* background map loader */
 const rgbeLoader = new RGBELoader();
@@ -173,13 +208,13 @@ const tick = () => {
   if (delta < interval) return;
   // 모델링의 애니메이션을 먼저 설정해 주고
   // Update object
-  sphere.rotation.y = 0.1 * elapsedTime
-  plane.rotation.y = 0.1 * elapsedTime
-  torus.rotation.y = 0.1 * elapsedTime
+  // sphere.rotation.y = 0.1 * elapsedTime
+  // plane.rotation.y = 0.1 * elapsedTime
+  // torus.rotation.y = 0.1 * elapsedTime
 
-  sphere.rotation.x = -0.15 * elapsedTime
-  plane.rotation.x = -0.15 * elapsedTime
-  torus.rotation.x = -0.15 * elapsedTime
+  // sphere.rotation.x = -0.15 * elapsedTime
+  // plane.rotation.x = -0.15 * elapsedTime
+  // torus.rotation.x = -0.15 * elapsedTime
 
   control.update()
 
