@@ -6,10 +6,42 @@ const canvas = document.querySelector("canvas")
 const scene = new THREE.Scene();
 
 
+
+/* Texture */
+const textureLoader = new THREE.TextureLoader();
+
+const doorColorTexture = textureLoader.load("/textures/door/color.jpg")
+const doorAlphaColorTexture = textureLoader.load("/textures/door/alpha.jpg")
+const doorAmbientOcclusionTexture = textureLoader.load("/textures/door/ambientOcclusion.jpg")
+const doorHeightTexture = textureLoader.load("/textures/door/height.jpg")
+const doorMetalnessTexture = textureLoader.load("/textures/door/metalness.jpg")
+const doorRoughnessTexture = textureLoader.load("/textures/door/roughness.jpg")
+const matcapTexture = textureLoader.load("/textures/matcaps/1.png")
+const gradientTexture = textureLoader.load("/textures/gradients/3.jpg")
+
+doorColorTexture.colorSpace = THREE.SRGBColorSpace
+matcapTexture.colorSpace = THREE.SRGBColorSpace
+
 /* Object */
 
 // MeshBasicMaterial
-const material = new THREE.MeshBasicMaterial()
+const material = new THREE.MeshBasicMaterial({
+  // map: doorColorTexture,
+  // color: "green"
+  
+})
+
+// material.color = "green" <= 작동하지 않음
+// material.color = new THREE.Color("green") <= 클래스로 보내 줘야 함
+// material.wireframe = true
+
+// opacity는 alpha를 조절해야 하기 때문에 transparent를 추가해 줘야 함
+// material.transparent = true
+// material.opacity = 0.5
+// material.alphaMap = doorColorTexture
+
+// material.side = THREE.DoubleSide // 오브젝트 앞뒷면 둘다 보이게
+
 
 const sphere = new THREE.Mesh(
   new THREE.SphereGeometry(0.5, 16, 16),
