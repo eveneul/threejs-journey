@@ -1,6 +1,12 @@
 import * as THREE from 'three';
 import gsap from 'gsap'
-import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls'
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
+import GUI from 'lil-gui';
+
+
+
+/* GUI (Debug) 설정 */
+const gui = new GUI()
 
 const canvas = document.querySelector("canvas")
 const scene = new THREE.Scene();
@@ -43,9 +49,52 @@ matcapTexture.colorSpace = THREE.SRGBColorSpace
 // material.side = THREE.DoubleSide // 오브젝트 앞뒷면 둘다 보이게
 
 // MeshNormalMaterial
-const material = new THREE.MeshNormalMaterial()
-material.side = THREE.DoubleSide // 오브젝트 앞뒷면 둘다 보이게
+// const material = new THREE.MeshNormalMaterial()
+// material.side = THREE.DoubleSide // 오브젝트 앞뒷면 둘다 보이게
 // material.flatShading = true // 둥근 부분을 평평하게 (각지게)
+
+// MeshMatcapMaterial: 색상의 명암을 나타내 줄 수 있음/빛이 있는 것마냥 (조명이 필요없음)
+// const material = new THREE.MeshMatcapMaterial()
+// material.matcap = matcapTexture 
+
+// MeshDepthMaterial: 카메라를 가까이하면 보이고, 멀리하면 안 보임
+// const material = new THREE.MeshDepthMaterial()
+
+// // MeshLambertMaterial: 조명이 필요함 
+// const material = new THREE.MeshLambertMaterial();
+// material.side = THREE.DoubleSide;
+
+// MeshPhongMaterial: 곡선 부분을 더 부드럽게
+// const material = new THREE.MeshPhongMaterial();
+// material.side = THREE.DoubleSide;
+// material.shininess = 100; // 반짝이는 정도
+// material.specular = new THREE.Color(0x1188ff) // 반짝이는 컬러
+
+// // MeshToonMaterial: 카툰 효과 (예: 젤다)
+// const material = new THREE.MeshToonMaterial();
+
+// MeshStandardMaterial: 옵션이 많아서 자주 쓰임
+const material = new THREE.MeshStandardMaterial({
+  metalness: 0.45, roughness: 0.45
+});
+
+gui.add(material, "metalness").min(0).max(1).step(0.0001);
+gui.add(material, "roughness").min(0).max(1).step(0.0001);
+
+
+
+
+material.side = THREE.DoubleSide;
+
+/* Light */
+const ambientLight = new THREE.AmbientLight(0xffffff, 1)
+const pointLight = new THREE.PointLight(0xffffff, 30)
+pointLight.position.x = 2;
+pointLight.position.y = 3;
+pointLight.position.z = 4;
+
+scene.add(ambientLight)
+scene.add(pointLight)
 
 const sphere = new THREE.Mesh(
   new THREE.SphereGeometry(0.5, 16, 16),
