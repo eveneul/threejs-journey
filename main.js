@@ -5,19 +5,30 @@ import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls'
 const canvas = document.querySelector("canvas")
 const scene = new THREE.Scene();
 
-console.log(gsap)
 
+/* Object */
 
+// MeshBasicMaterial
+const material = new THREE.MeshBasicMaterial()
 
+const sphere = new THREE.Mesh(
+  new THREE.SphereGeometry(0.5, 16, 16),
+  material
+)
 
-const geometry = new THREE.BoxGeometry(1, 1, 1);
-const material = new THREE.MeshBasicMaterial({ color: "red" });
-const box = new THREE.Mesh(geometry, material);
-// box.position.set(1, 1, -2)
+const plane = new THREE.Mesh(
+  new THREE.PlaneGeometry(1, 1),
+  material
+)
 
+const torus = new THREE.Mesh(
+  new THREE.TorusGeometry(0.3, 0.2, 16, 32), material
+)
 
+sphere.position.x = 1.5;
+torus.position.x = -1.5;
 
-scene.add(box);
+scene.add(sphere, plane, torus)
 
 
 // camera 
@@ -64,9 +75,15 @@ const tick = () => {
   delta = now - then;
   if (delta < interval) return;
   // 모델링의 애니메이션을 먼저 설정해 주고
+  // Update object
+  sphere.rotation.y = 0.1 * elapsedTime
+  plane.rotation.y = 0.1 * elapsedTime
+  torus.rotation.y = 0.1 * elapsedTime
 
-  box.rotation.y = Math.sin(elapsedTime)
-  box.rotation.x = Math.cos(elapsedTime)
+  sphere.rotation.x = -0.15 * elapsedTime
+  plane.rotation.x = -0.15 * elapsedTime
+  torus.rotation.x = -0.15 * elapsedTime
+
   control.update()
 
   // renderer.render()로 다시 랜더링 시켜 주기
