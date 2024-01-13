@@ -11,71 +11,82 @@ import { TextGeometry } from "three/examples/jsm/geometries/TextGeometry";
 const gui = new GUI();
 
 const canvas = document.querySelector("canvas");
+
 const scene = new THREE.Scene();
 
-/* Texture Loader */
-const textureLoader = new THREE.TextureLoader();
-const matcapTextuer = textureLoader.load("/textures/matcaps/1.png");
-console.log(matcapTextuer, "matcapTextuer");
-// matcapTexture.colorSpace = THREE.SRGBColorSpace
-
-/* Font */
-
-const fontLoader = new FontLoader();
-fontLoader.load("/fonts/helvetiker_regular.typeface.json", (font) => {
-  const textGeometry = new TextGeometry("Marshot", {
-    font,
-    size: 0.5,
-    height: 0.2,
-    curveSegments: 5, // 둥근 정도, 숫자가 낮으면 각져보인다
-    bevelEnabled: true, //
-
-    bevelThickness: 0.03, // 텍스트의 굵기 (z축으로)
-    bevelSize: 0.02,
-    bevelOffset: 0,
-    bevelSegments: 4, // 둥근 부분에 segements, 숫자가 높으면 더 정교함
-  });
-
-  /* 처음에 로드되면 텍스트가 중앙에 위치하지 않은데, 중앙에 위치하도록 설정 */
-  // 어려운 방법..
-  // textGeometry.computeBoundingBox();
-  // textGeometry.translate(
-  //   -textGeometry.boundingBox.max.x * 0.5,
-  //   -textGeometry.boundingBox.max.y * 0.5,
-  //   -textGeometry.boundingBox.max.z * 0.5
-  // );
-
-  textGeometry.center();
-
-  const textMaterial = new THREE.MeshMatcapMaterial({
-    matcap: matcapTextuer,
-  });
-  // textMaterial.wireframe = true;
-
-  const text = new THREE.Mesh(textGeometry, textMaterial);
-  scene.add(text);
-  const donutGeometry = new THREE.TorusGeometry(0.3, 0.2, 20, 45);
-  const donutMaterial = new THREE.MeshMatcapMaterial({ matcap: matcapTextuer });
-  for (let i = 0; i < 100; i++) {
-    const donut = new THREE.Mesh(donutGeometry, donutMaterial);
-    donut.position.x = (Math.random() - 0.5) * 10;
-    donut.position.y = (Math.random() - 0.5) * 10;
-    donut.position.z = (Math.random() - 0.5) * 10;
-    donut.rotation.x = Math.random() * Math.PI;
-    donut.rotation.y = Math.random() * Math.PI;
-    donut.rotation.z = Math.random() * Math.PI;
-
-    const scale = Math.random();
-    donut.scale.x = scale;
-    donut.scale.y = scale;
-    donut.scale.z = scale;
-
-    scene.add(donut);
-  }
+/* Object */
+const meterial = new THREE.MeshStandardMaterial({
+  roughness: 0.4,
+  color: 0xffffff,
 });
+const cube = new THREE.Mesh(new THREE.BoxGeometry(0.75, 0.75, 0.75), meterial);
+const sphere = new THREE.Mesh(new THREE.SphereGeometry(0.5, 32, 32), meterial);
+const torus = new THREE.Mesh(
+  new THREE.TorusGeometry(0.3, 0.2, 32, 64),
+  meterial
+);
+
+const plane = new THREE.Mesh(
+  new THREE.PlaneGeometry(16, 16),
+  new THREE.MeshStandardMaterial({ color: 0xffffff, side: THREE.DoubleSide })
+);
+
+sphere.position.x = 1.5;
+torus.position.x = -1.5;
+plane.rotation.x = -Math.PI * 0.5;
+plane.position.y = -0.65;
+
+scene.add(cube, sphere, torus, plane);
 
 const axesHelper = new THREE.AxesHelper();
-// scene.add(axesHelper);
+scene.add(axesHelper);
+
+// light
+
+// ambientLight(컬러, 빛의 세기), 모든 위치에서 조명을 비춤
+const ambientLight = new THREE.AmbientLight(0xffffff, 1);
+// scene.add(ambientLight);
+
+// DirectionalLight: 명암? 그림자를 지게 하는 코드, ambientLight와 같이 색상과 세기를 받음 위치를 지정할 수 있음
+const directionalLight = new THREE.DirectionalLight(0xffffff, 0.7);
+directionalLight.position.set(1, 0.25, 0);
+// scene.add(directionalLight);
+
+// hemisphereLight(color, groundColor, 빛의 세기), 빛이 쐬는 방향에 색깔과 빛이 닿지 않는 곳에 색깔을 지정할 수 있음
+const hemisphereLight = new THREE.HemisphereLight(0xff0000, 0x000ff, 0.9);
+// scene.add(hemisphereLight);
+
+// pointLight: 거리와 감쇠를 나타냄, 세 번째 매개변수로
+const pointLight = new THREE.PointLight(0xff9000, 1, 10);
+pointLight.position.set(1, -0.5, 1);
+// scene.add(pointLight);
+
+// rectAreaLight(color, 강도, width, height), 스튜디오 조명 같은 효과
+const rectAreaLight = new THREE.RectAreaLight(0x4e00ff, 2, 3, 1);
+rectAreaLight.position.set(-1.5, 0, 1.5);
+rectAreaLight.lookAt(new THREE.Vector3());
+// scene.add(rectAreaLight);
+
+// spotLight(color, 강도, 거리, 각도, 블러효과(0-1), 은은한 정도)
+const spotLight = new THREE.SpotLight(
+  0x78ff00,
+  0.5,
+  10,
+  Math.PI * 0.1,
+  0.25,
+  1
+);
+spotLight.position.set(0, 2, 3);
+scene.add(spotLight);
+
+console.log(spotLight);
+
+// gui.add(변수, 변수에서 조정할 값)
+
+gui.add(spotLight, "intensity").min(0).max(3).step(0.001);
+gui.add(spotLight, "distance").min(0).max(20).step(0.1);
+gui.add(spotLight, "penumbra").min(0).max(1).step(0.001);
+gui.add(spotLight, "decay").min(0).max(3).step(0.001);
 
 // camera
 const camera = new THREE.PerspectiveCamera(
@@ -88,7 +99,7 @@ camera.position.z = 3;
 
 scene.add(camera);
 
-const renderer = new THREE.WebGLRenderer({ canvas });
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
 
 // animation
@@ -114,6 +125,13 @@ const tick = () => {
   delta = now - then;
   if (delta < interval) return;
   // 모델링의 애니메이션을 먼저 설정해 주고
+
+  cube.rotation.x = 0.5 * elapsedTime;
+  cube.rotation.y = 0.5 * elapsedTime;
+  sphere.rotation.x = 0.5 * elapsedTime;
+  sphere.rotation.y = 0.5 * elapsedTime;
+  torus.rotation.x = 0.5 * elapsedTime;
+  torus.rotation.y = 0.5 * elapsedTime;
 
   control.update();
 
