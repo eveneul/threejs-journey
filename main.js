@@ -47,7 +47,53 @@ roof.position.y =
 
 roof.rotation.y = Math.PI * 0.25;
 
-house.add(walls, roof);
+const door = new THREE.Mesh(
+  new THREE.PlaneGeometry(2, 2),
+  new THREE.MeshStandardMaterial({ color: "#aa7b7b" })
+);
+door.position.y = door.geometry.parameters.height / 2;
+door.position.z = door.geometry.parameters.height + 0.01;
+
+const bushesGeometry = new THREE.SphereGeometry(1, 16, 16);
+const bushesMaterial = new THREE.MeshStandardMaterial({ color: "#89c854" });
+
+const bush1 = new THREE.Mesh(bushesGeometry, bushesMaterial);
+const bush2 = new THREE.Mesh(bushesGeometry, bushesMaterial);
+const bush3 = new THREE.Mesh(bushesGeometry, bushesMaterial);
+const bush4 = new THREE.Mesh(bushesGeometry, bushesMaterial);
+
+bush1.scale.set(0.5, 0.5, 0.5);
+bush1.position.set(0.8, 0.2, 2.2);
+
+bush2.scale.set(0.25, 0.25, 0.25);
+bush2.position.set(1.4, 0.1, 2.1);
+
+bush3.scale.set(0.4, 0.4, 0.4);
+bush3.position.set(-0.7, 0.1, 2.2);
+
+bush4.scale.set(0.15, 0.15, 0.15);
+bush4.position.set(-1, 0.05, 2.6);
+
+house.add(walls, roof, door, bush1, bush2, bush3, bush4);
+
+// graves
+const graves = new THREE.Group();
+scene.add(graves);
+
+const graveGeometry = new THREE.BoxGeometry(0.6, 0.8, 0.2);
+const graveMaterial = new THREE.MeshStandardMaterial({ color: "#b2b6b1" });
+
+for (let i = 0; i < 50; i++) {
+  const angle = Math.random() * Math.PI * 2;
+  const radius = 3 + Math.random() * 6;
+  const x = Math.sin(angle) * radius;
+  const z = Math.cos(angle) * radius;
+
+  const grave = new THREE.Mesh(graveGeometry, graveMaterial);
+  // console.log(graveGeometry.parameters.height);
+  grave.position.set(x, graveGeometry.parameters.height / 2, z);
+  graves.add(grave);
+}
 
 /* Light */
 /* 그림자 영향을 받는 조명: directional, point, shot */
