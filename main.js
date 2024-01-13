@@ -15,78 +15,54 @@ const canvas = document.querySelector("canvas");
 const scene = new THREE.Scene();
 
 /* Object */
-const meterial = new THREE.MeshStandardMaterial({
-  roughness: 0.4,
-  color: 0xffffff,
-});
-const cube = new THREE.Mesh(new THREE.BoxGeometry(0.75, 0.75, 0.75), meterial);
-const sphere = new THREE.Mesh(new THREE.SphereGeometry(0.5, 32, 32), meterial);
-const torus = new THREE.Mesh(
-  new THREE.TorusGeometry(0.3, 0.2, 32, 64),
-  meterial
-);
 
-const plane = new THREE.Mesh(
-  new THREE.PlaneGeometry(16, 16),
-  new THREE.MeshStandardMaterial({ color: 0xffffff, side: THREE.DoubleSide })
-);
-
-sphere.position.x = 1.5;
-torus.position.x = -1.5;
+const material = new THREE.MeshStandardMaterial({ color: 0xffffff });
+const sphere = new THREE.Mesh(new THREE.SphereGeometry(1, 16, 16), material);
+const box = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), material);
+const plane = new THREE.Mesh(new THREE.PlaneGeometry(20, 20), material);
+sphere.position.y = 0.5;
+sphere.castShadow = true; // 그림자를 만들 객체에 castShadow
+box.position.set(-2, 0, -3);
+box.castShadow = true;
 plane.rotation.x = -Math.PI * 0.5;
 plane.position.y = -0.65;
+plane.receiveShadow = true; // 그림자를 받을 객체에 receiveShadow
+scene.add(sphere, plane, box);
 
-scene.add(cube, sphere, torus, plane);
+/* Light */
+/* 그림자 영향을 받는 조명: directional, point, shot */
 
-const axesHelper = new THREE.AxesHelper();
-scene.add(axesHelper);
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+scene.add(ambientLight);
 
-// light
+const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+directionalLight.position.set(0, 3, 5);
+directionalLight.castShadow = true;
+directionalLight.shadow.mapSize.width = 1024;
+directionalLight.shadow.mapSize.height = 1024;
 
-// ambientLight(컬러, 빛의 세기), 모든 위치에서 조명을 비춤
-const ambientLight = new THREE.AmbientLight(0xffffff, 1);
-// scene.add(ambientLight);
+console.log(directionalLight.shadow, directionalLight);
 
-// DirectionalLight: 명암? 그림자를 지게 하는 코드, ambientLight와 같이 색상과 세기를 받음 위치를 지정할 수 있음
-const directionalLight = new THREE.DirectionalLight(0xffffff, 0.7);
-directionalLight.position.set(1, 0.25, 0);
-// scene.add(directionalLight);
+scene.add(directionalLight);
 
-// hemisphereLight(color, groundColor, 빛의 세기), 빛이 쐬는 방향에 색깔과 빛이 닿지 않는 곳에 색깔을 지정할 수 있음
-const hemisphereLight = new THREE.HemisphereLight(0xff0000, 0x000ff, 0.9);
-// scene.add(hemisphereLight);
+gui.add(directionalLight, "intensity").min(1).max(10).step(0.01);
+gui.add(directionalLight.position, "x").min(0).max(10).step(0.1);
+gui.add(directionalLight.position, "y").min(0).max(10).step(0.1);
+gui.add(directionalLight.position, "z").min(0).max(10).step(0.1);
+gui.add(directionalLight.shadow.mapSize, "x").min(100).max(1000).step(1);
+gui.add(directionalLight.shadow.mapSize, "y").min(100).max(1000).step(1);
+gui.add(directionalLight.shadow.mapSize, "width").min(100).max(2048).step(1);
+gui.add(directionalLight.shadow.mapSize, "height").min(100).max(2048).step(1);
+gui.add(directionalLight.shadow.camera, "near").min(0.1).max(10).step(0.001);
+gui.add(directionalLight.shadow.camera, "far").min(0.1).max(1000).step(0.001);
+gui.add(directionalLight.shadow, "radius").min(0.1).max(1000).step(0.001);
 
-// pointLight: 거리와 감쇠를 나타냄, 세 번째 매개변수로
-const pointLight = new THREE.PointLight(0xff9000, 1, 10);
-pointLight.position.set(1, -0.5, 1);
-// scene.add(pointLight);
+// const lightHelper = new THREE.DirectionalLightHelper(directionalLight, 5);
+// scene.add(lightHelper);
 
-// rectAreaLight(color, 강도, width, height), 스튜디오 조명 같은 효과
-const rectAreaLight = new THREE.RectAreaLight(0x4e00ff, 2, 3, 1);
-rectAreaLight.position.set(-1.5, 0, 1.5);
-rectAreaLight.lookAt(new THREE.Vector3());
-// scene.add(rectAreaLight);
-
-// spotLight(color, 강도, 거리, 각도, 블러효과(0-1), 은은한 정도)
-const spotLight = new THREE.SpotLight(
-  0x78ff00,
-  0.5,
-  10,
-  Math.PI * 0.1,
-  0.25,
-  1
-);
-spotLight.position.set(0, 2, 3);
-scene.add(spotLight);
-
-console.log(spotLight);
-
-// gui.add(변수, 변수에서 조정할 값)
-
-gui.add(spotLight, "intensity").min(0).max(3).step(0.001);
-gui.add(spotLight, "distance").min(0).max(20).step(0.1);
-gui.add(spotLight, "penumbra").min(0).max(1).step(0.001);
-gui.add(spotLight, "decay").min(0).max(3).step(0.001);
+const helper = new THREE.CameraHelper(directionalLight.shadow.camera);
+helper.visible = false;
+scene.add(helper);
 
 // camera
 const camera = new THREE.PerspectiveCamera(
@@ -95,12 +71,18 @@ const camera = new THREE.PerspectiveCamera(
   0.1,
   1000
 );
-camera.position.z = 3;
+camera.position.z = 10;
+camera.position.y = 5;
+camera.position.x = -5;
+camera.lookAt(new THREE.Vector3());
 
 scene.add(camera);
 
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
+
+renderer.shadowMap.enabled = true; // 렌더러에게 섀도우 맵을 처리하라고 지시
+renderer.shadowMap.type = THREE.PCFShadowMap; // 그림자 가장자리가 더 자연스러워지게 블러처리..?
 
 // animation
 
@@ -126,12 +108,9 @@ const tick = () => {
   if (delta < interval) return;
   // 모델링의 애니메이션을 먼저 설정해 주고
 
-  cube.rotation.x = 0.5 * elapsedTime;
-  cube.rotation.y = 0.5 * elapsedTime;
-  sphere.rotation.x = 0.5 * elapsedTime;
-  sphere.rotation.y = 0.5 * elapsedTime;
-  torus.rotation.x = 0.5 * elapsedTime;
-  torus.rotation.y = 0.5 * elapsedTime;
+  box.rotation.x = 0.5 * elapsedTime;
+  box.rotation.y = 0.5 * elapsedTime;
+  box.rotation.z = 0.5 * elapsedTime;
 
   control.update();
 
