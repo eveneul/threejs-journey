@@ -16,53 +16,46 @@ const scene = new THREE.Scene();
 
 /* Object */
 
-const material = new THREE.MeshStandardMaterial({ color: 0xffffff });
-const sphere = new THREE.Mesh(new THREE.SphereGeometry(1, 16, 16), material);
-const box = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), material);
-const plane = new THREE.Mesh(new THREE.PlaneGeometry(20, 20), material);
-sphere.position.y = 0.5;
-sphere.castShadow = true; // 그림자를 만들 객체에 castShadow
-box.position.set(-2, 0, -3);
-box.castShadow = true;
-plane.rotation.x = -Math.PI * 0.5;
-plane.position.y = -0.65;
-plane.receiveShadow = true; // 그림자를 받을 객체에 receiveShadow
-scene.add(sphere, plane, box);
+const floor = new THREE.Mesh(
+  new THREE.PlaneGeometry(20, 20),
+  new THREE.MeshStandardMaterial({ color: "#a9c388" })
+);
+
+floor.position.y = 0;
+floor.rotation.x = -Math.PI * 0.5;
+
+scene.add(floor);
+
+// House: new THREE.Group <= 크기 조정하면 한 번에 조정되게 그룹핑
+
+const house = new THREE.Group();
+scene.add(house);
+
+const walls = new THREE.Mesh(
+  new THREE.BoxGeometry(4, 2.5, 4),
+  new THREE.MeshStandardMaterial({ color: "#ac8e82" })
+);
+walls.position.y = walls.geometry.parameters.height / 2;
+
+const roof = new THREE.Mesh(
+  new THREE.ConeGeometry(3.5, 1, 4),
+  new THREE.MeshStandardMaterial({ color: "#b35f45" })
+);
+
+roof.position.y =
+  walls.geometry.parameters.height + roof.geometry.parameters.height / 2;
+
+roof.rotation.y = Math.PI * 0.25;
+
+house.add(walls, roof);
 
 /* Light */
 /* 그림자 영향을 받는 조명: directional, point, shot */
 
 const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
-scene.add(ambientLight);
 
 const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
-directionalLight.position.set(0, 3, 5);
-directionalLight.castShadow = true;
-directionalLight.shadow.mapSize.width = 1024;
-directionalLight.shadow.mapSize.height = 1024;
-
-console.log(directionalLight.shadow, directionalLight);
-
-scene.add(directionalLight);
-
-gui.add(directionalLight, "intensity").min(1).max(10).step(0.01);
-gui.add(directionalLight.position, "x").min(0).max(10).step(0.1);
-gui.add(directionalLight.position, "y").min(0).max(10).step(0.1);
-gui.add(directionalLight.position, "z").min(0).max(10).step(0.1);
-gui.add(directionalLight.shadow.mapSize, "x").min(100).max(1000).step(1);
-gui.add(directionalLight.shadow.mapSize, "y").min(100).max(1000).step(1);
-gui.add(directionalLight.shadow.mapSize, "width").min(100).max(2048).step(1);
-gui.add(directionalLight.shadow.mapSize, "height").min(100).max(2048).step(1);
-gui.add(directionalLight.shadow.camera, "near").min(0.1).max(10).step(0.001);
-gui.add(directionalLight.shadow.camera, "far").min(0.1).max(1000).step(0.001);
-gui.add(directionalLight.shadow, "radius").min(0.1).max(1000).step(0.001);
-
-// const lightHelper = new THREE.DirectionalLightHelper(directionalLight, 5);
-// scene.add(lightHelper);
-
-const helper = new THREE.CameraHelper(directionalLight.shadow.camera);
-helper.visible = false;
-scene.add(helper);
+scene.add(ambientLight, directionalLight);
 
 // camera
 const camera = new THREE.PerspectiveCamera(
@@ -71,19 +64,26 @@ const camera = new THREE.PerspectiveCamera(
   0.1,
   1000
 );
-camera.position.z = 10;
+camera.position.z = 4;
 camera.position.y = 5;
-camera.position.x = -5;
+camera.position.x = -2;
 camera.lookAt(new THREE.Vector3());
 
 scene.add(camera);
 
+/* Gui Setting */
+
+const guiLightFolder = gui.addFolder("light");
+guiLightFolder.add(ambientLight, "intensity").min(0).max(10).step(0.001);
+guiLightFolder.add(directionalLight, "intensity").min(0).max(10).step(0.001);
+
+const guiCameraFolder = gui.addFolder("camera");
+guiCameraFolder.add(camera.position, "x").min(-5).max(10).step(0.01);
+guiCameraFolder.add(camera.position, "y").min(-5).max(10).step(0.01);
+guiCameraFolder.add(camera.position, "z").min(-5).max(10).step(0.01);
+
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
-
-renderer.shadowMap.enabled = true; // 렌더러에게 섀도우 맵을 처리하라고 지시
-renderer.shadowMap.type = THREE.PCFShadowMap; // 그림자 가장자리가 더 자연스러워지게 블러처리..?
-
 // animation
 
 let now, delta;
@@ -107,10 +107,6 @@ const tick = () => {
   delta = now - then;
   if (delta < interval) return;
   // 모델링의 애니메이션을 먼저 설정해 주고
-
-  box.rotation.x = 0.5 * elapsedTime;
-  box.rotation.y = 0.5 * elapsedTime;
-  box.rotation.z = 0.5 * elapsedTime;
 
   control.update();
 
