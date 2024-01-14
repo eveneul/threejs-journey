@@ -14,17 +14,69 @@ const canvas = document.querySelector("canvas");
 
 const scene = new THREE.Scene();
 
-/* Object */
+/* Texture */
+const textureLoader = new THREE.TextureLoader();
+const doorColorTexture = textureLoader.load("/textures/door/color.jpg");
+const doorAlphaTexture = textureLoader.load("/textures/door/alpha.jpg");
+const doorAmbientOcclusionTexture = textureLoader.load(
+  "/textures/door/ambientOcclusion.jpg"
+);
+const doorHeightTexture = textureLoader.load("/textures/door/height.jpg");
+const doorMetalnessTexture = textureLoader.load("/textures/door/metalness.jpg");
+const doorNormalTexture = textureLoader.load("/textures/door/normal.jpg");
+const doorRoughnessTexture = textureLoader.load("/textures/door/roughness.jpg");
 
-const floor = new THREE.Mesh(
-  new THREE.PlaneGeometry(20, 20),
-  new THREE.MeshStandardMaterial({ color: "#a9c388" })
+const bricksColorTexture = textureLoader.load("/textures/bricks/color.jpg");
+const bricksNormalTexture = textureLoader.load("/textures/bricks/normal.jpg");
+const bricksAmbientOcclusionTexture = textureLoader.load(
+  "/textures/bricks/ambientOcclusion.jpg"
+);
+const bricksRoughnessTexture = textureLoader.load(
+  "/textures/bricks/roughness.jpg"
 );
 
-floor.position.y = 0;
-floor.rotation.x = -Math.PI * 0.5;
+const grassColorTexture = textureLoader.load("/textures/grass/color.jpg");
+const grassNormalTexture = textureLoader.load("/textures/grass/normal.jpg");
+const grassAmbientOcclusionTexture = textureLoader.load(
+  "/textures/grass/ambientOcclusion.jpg"
+);
+const grassRoughnessTexture = textureLoader.load(
+  "/textures/grass/roughness.jpg"
+);
 
-scene.add(floor);
+// 잔디 모양을 작게 만들기
+grassColorTexture.repeat.set(8, 8);
+grassNormalTexture.repeat.set(8, 8);
+grassAmbientOcclusionTexture.repeat.set(8, 8);
+grassRoughnessTexture.repeat.set(8, 8);
+
+// 잔디 모양 작게 만든 후 해야 할 오류 수정
+grassColorTexture.wrapS = THREE.RepeatWrapping;
+grassNormalTexture.wrapS = THREE.RepeatWrapping;
+grassAmbientOcclusionTexture.wrapS = THREE.RepeatWrapping;
+grassRoughnessTexture.wrapS = THREE.RepeatWrapping;
+
+grassColorTexture.wrapT = THREE.RepeatWrapping;
+grassNormalTexture.wrapT = THREE.RepeatWrapping;
+grassAmbientOcclusionTexture.wrapT = THREE.RepeatWrapping;
+grassRoughnessTexture.wrapT = THREE.RepeatWrapping;
+
+/* Object */
+
+const grass = new THREE.Mesh(
+  new THREE.PlaneGeometry(20, 20),
+  new THREE.MeshStandardMaterial({
+    map: grassColorTexture,
+    normalMap: grassNormalTexture,
+    aoMap: grassAmbientOcclusionTexture,
+    roughnessMap: grassRoughnessTexture,
+  })
+);
+
+grass.position.y = 0;
+grass.rotation.x = -Math.PI * 0.5;
+
+scene.add(grass);
 
 // House: new THREE.Group <= 크기 조정하면 한 번에 조정되게 그룹핑
 
@@ -33,7 +85,13 @@ scene.add(house);
 
 const walls = new THREE.Mesh(
   new THREE.BoxGeometry(4, 2.5, 4),
-  new THREE.MeshStandardMaterial({ color: "#ac8e82" })
+  new THREE.MeshStandardMaterial({
+    map: bricksColorTexture,
+    normalMap: bricksNormalTexture,
+    aoMap: bricksAmbientOcclusionTexture,
+    roughnessMap: bricksRoughnessTexture,
+    transparent: true,
+  })
 );
 walls.position.y = walls.geometry.parameters.height / 2;
 
@@ -48,9 +106,20 @@ roof.position.y =
 roof.rotation.y = Math.PI * 0.25;
 
 const door = new THREE.Mesh(
-  new THREE.PlaneGeometry(2, 2),
-  new THREE.MeshStandardMaterial({ color: "#aa7b7b" })
+  new THREE.PlaneGeometry(2, 2, 100, 100),
+  new THREE.MeshStandardMaterial({
+    transparent: true,
+    map: doorColorTexture,
+    alphaMap: doorAlphaTexture,
+    aoMap: doorAmbientOcclusionTexture,
+    displacementMap: doorHeightTexture,
+    displacementScale: 0.1,
+    normalMap: doorNormalTexture,
+    metalnessMap: doorMetalnessTexture,
+    roughnessMap: doorRoughnessTexture,
+  })
 );
+
 door.position.y = door.geometry.parameters.height / 2;
 door.position.z = door.geometry.parameters.height + 0.01;
 
@@ -138,6 +207,7 @@ guiCameraFolder.add(camera.position, "z").min(-5).max(10).step(0.01);
 
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setClearColor("#262837");
 // animation
 
 let now, delta;
