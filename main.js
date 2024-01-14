@@ -98,10 +98,14 @@ for (let i = 0; i < 50; i++) {
 /* Light */
 /* 그림자 영향을 받는 조명: directional, point, shot */
 
-const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+const ambientLight = new THREE.AmbientLight("#b9d5ff", 0.12);
 
-const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+const directionalLight = new THREE.DirectionalLight("#b9d5ff", 0.26);
 scene.add(ambientLight, directionalLight);
+
+const doorLight = new THREE.PointLight("#ff7d46", 3, 7);
+doorLight.position.set(0, 2.2, 2.8);
+house.add(doorLight);
 
 // camera
 const camera = new THREE.PerspectiveCamera(
