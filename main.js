@@ -10,15 +10,17 @@ const scene = new THREE.Scene();
 // texture
 
 const textureLoader = new THREE.TextureLoader();
-const particleTexture = textureLoader.load("/textures/particles/11.png");
+const particleTexture = textureLoader.load("/textures/particles/1.png");
 
 // object 생성
-const count = 5000; // 파티클 개수
+const count = 2000; // 파티클 개수
+const colors = new Float32Array(count * 3);
 const positions = new Float32Array(count * 3);
 const particlesGeometry = new THREE.BufferGeometry();
 
 for (let i = 0; i < count * 3; i++) {
   positions[i] = (Math.random() - 0.5) * 10;
+  colors[i] = Math.random();
 }
 
 particlesGeometry.setAttribute(
@@ -26,12 +28,17 @@ particlesGeometry.setAttribute(
   new THREE.BufferAttribute(positions, 3)
 );
 
+particlesGeometry.setAttribute("color", new THREE.BufferAttribute(colors, 3));
+
 const particlesMaterial = new THREE.PointsMaterial({
   size: 0.02,
   sizeAttenuation: true, //원근감
+  // color: "#ff88cc",
   alphaMap: particleTexture,
   transparent: true,
-  depthTest: false,
+  depthWrite: false,
+  blending: THREE.AdditiveBlending, // 블렌딩, 프레임 속도가 저하될 수 있음
+  vertexColors: true,
 });
 
 // particle
@@ -82,6 +89,7 @@ const animate = () => {
   const time = clock.getElapsedTime();
 
   if (delta < interval) return;
+  particles.rotation.y = time * 0.2;
 
   renderer.render(scene, camera);
   control.update();
