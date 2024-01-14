@@ -176,6 +176,12 @@ const doorLight = new THREE.PointLight("#ff7d46", 3, 7);
 doorLight.position.set(0, 2.2, 2.8);
 house.add(doorLight);
 
+/* 유령 */
+const ghost1 = new THREE.PointLight("#ff00ff", 6, 3);
+const ghost2 = new THREE.PointLight("#00ffff", 6, 3);
+const ghost3 = new THREE.PointLight("#ffff00", 6, 3);
+scene.add(ghost1, ghost2, ghost3);
+
 /* 안개 */
 const fog = new THREE.Fog("#262837", 1, 15);
 scene.fog = fog;
@@ -232,6 +238,22 @@ const tick = () => {
   if (delta < interval) return;
   // 모델링의 애니메이션을 먼저 설정해 주고
 
+  // Update ghost
+  const ghost1Angle = elapsedTime * 0.5;
+  ghost1.position.x = Math.cos(ghost1Angle) * 4;
+  ghost1.position.z = Math.sin(ghost1Angle) * 4;
+  ghost1.position.y = Math.sin(ghost1Angle * 3);
+
+  const ghost2Angle = -elapsedTime * 0.32;
+  ghost2.position.x = Math.cos(ghost2Angle) * 5;
+  ghost2.position.z = Math.sin(ghost2Angle) * 5;
+  ghost2.position.y = Math.sin(ghost2Angle * 3);
+
+  const ghost3Angle = -elapsedTime * 0.17;
+  ghost3.position.x =
+    Math.cos(ghost3Angle) * (7 + Math.sin(elapsedTime) * 0.32);
+  ghost3.position.z = Math.sin(ghost3Angle) * (7 + Math.sin(elapsedTime) * 0.5);
+  ghost3.position.y = Math.sin(ghost3Angle * 2);
   control.update();
 
   // renderer.render()로 다시 랜더링 시켜 주기
