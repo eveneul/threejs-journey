@@ -145,7 +145,7 @@ bush4.position.set(-1, 0.05, 2.6);
 
 house.add(walls, roof, door, bush1, bush2, bush3, bush4);
 
-// graves
+// 무덤
 const graves = new THREE.Group();
 scene.add(graves);
 
@@ -159,7 +159,8 @@ for (let i = 0; i < 50; i++) {
   const z = Math.cos(angle) * radius;
 
   const grave = new THREE.Mesh(graveGeometry, graveMaterial);
-  // console.log(graveGeometry.parameters.height);
+
+  grave.castShadow = true;
   grave.position.set(x, graveGeometry.parameters.height / 2, z);
   graves.add(grave);
 }
@@ -180,6 +181,7 @@ house.add(doorLight);
 const ghost1 = new THREE.PointLight("#ff00ff", 6, 3);
 const ghost2 = new THREE.PointLight("#00ffff", 6, 3);
 const ghost3 = new THREE.PointLight("#ffff00", 6, 3);
+
 scene.add(ghost1, ghost2, ghost3);
 
 /* 안개 */
@@ -200,6 +202,40 @@ camera.lookAt(new THREE.Vector3());
 
 scene.add(camera);
 
+/**
+ * Shadow
+ */
+
+ghost1.castShadow = true;
+ghost2.castShadow = true;
+ghost3.castShadow = true;
+directionalLight.castShadow = true;
+doorLight.castShadow = true;
+
+walls.castShadow = true;
+bush1.castShadow = true;
+bush2.castShadow = true;
+bush3.castShadow = true;
+bush4.castShadow = true;
+
+grass.receiveShadow = true;
+
+doorLight.shadow.mapSize.width = 256;
+doorLight.shadow.mapSize.height = 256;
+doorLight.shadow.camera.far = 7;
+
+ghost1.shadow.mapSize.width = 256;
+ghost1.shadow.mapSize.height = 256;
+ghost1.shadow.camera.far = 7;
+
+ghost2.shadow.mapSize.width = 256;
+ghost2.shadow.mapSize.height = 256;
+ghost2.shadow.camera.far = 7;
+
+ghost3.shadow.mapSize.width = 256;
+ghost3.shadow.mapSize.height = 256;
+ghost3.shadow.camera.far = 7;
+
 /* Gui Setting */
 
 const guiLightFolder = gui.addFolder("light");
@@ -214,6 +250,8 @@ guiCameraFolder.add(camera.position, "z").min(-5).max(10).step(0.01);
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setClearColor("#262837");
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFShadowMap;
 // animation
 
 let now, delta;
