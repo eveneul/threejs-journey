@@ -54,15 +54,40 @@ const world = new CANNON.World();
 // 중력 추가
 world.gravity.set(0, -9.82, 0);
 
+// material
+// 바닥에 대한 재료
+const concreteMaterial = new CANNON.Material("concrete");
+const plasticMaterial = new CANNON.Material("plastic");
+
+const concretePlasticContactMaterial = new CANNON.ContactMaterial(
+  concreteMaterial,
+  plasticMaterial,
+  {
+    friction: 0.1, // 마찰
+    restitution: 0.7, // 탄성 (탱탱볼 처럼)
+  }
+);
+
+world.addContactMaterial(concretePlasticContactMaterial);
+
 // body 만들기
 const sphereShape = new CANNON.Sphere(0.5);
 const sphereBody = new CANNON.Body({
   mass: 1, //질량
   position: new CANNON.Vec3(0, 3, 0),
   shape: sphereShape,
+  material: plasticMaterial,
 });
-
 world.add(sphereBody);
+
+const floorShape = new CANNON.Plane();
+const floorBody = new CANNON.Body();
+floorBody.mess = 0; // default: 0
+floorBody.quaternion.setFromAxisAngle(new CANNON.Vec3(-1, 0, 0), Math.PI / 2);
+floorBody.addShape(floorShape);
+floorBody.material = concreteMaterial;
+
+world.add(floorBody);
 
 const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
 scene.add(ambientLight);
